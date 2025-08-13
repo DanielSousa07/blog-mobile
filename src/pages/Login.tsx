@@ -7,14 +7,7 @@ const Login = () => {
     <View style={styles.container}>
       <Text>Login</Text>
       <TouchableOpacity
-        onPress={async () => {
-          try {
-            const data = await login("kminchelle", "0lelplR");
-            console.log("Login OK:", data);
-          } catch (err) {
-            console.log("Erro ao logar:", err);
-          }
-        }}
+        onPress={() => login("emilys", "emilyspass")}
       >
         <Text>Entrar</Text>
       </TouchableOpacity>
