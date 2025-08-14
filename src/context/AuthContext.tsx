@@ -2,9 +2,12 @@ import {
   createContext,
   useState,
   PropsWithChildren,
+  useEffect,
+  use
 } from "react";
 import { api } from "../services/api";
 import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type User = {
   id: number;
@@ -27,6 +30,17 @@ export const AuthContext = createContext<AuthContextProps>(
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    async function getStorageData() {
+      const storageData = await AsyncStorage.getItem("naoseiOQUEfazerDAvida@_")
+
+      if (storageData) {
+        setUser(JSON.parse(storageData))
+      } 
+    }
+    getStorageData()
+  }, [])
+
   async function login(username: string, password: string) {
     console.log("Tentando logar com:", { username, password });
     
@@ -41,7 +55,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         },
         body: JSON.stringify(requestBody),
       });
-
+      
       console.log("Resposta da API recebida. Status:", response.status);
 
       if (!response.ok) {
@@ -54,6 +68,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       const data: User = await response.json();
       console.log("Login bem-sucedido. Dados do usuário:", data);
 
+      AsyncStorage.setItem("naoseiOQUEfazerDAvida@_", JSON.stringify(data))
+
       setUser(data);
     } catch (error) {
       console.log("Erro capturado durante o login:", error);
@@ -61,7 +77,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   }
 
-  async function logout() {}
+  async function logout() {
+    setUser(null)
+    await AsyncStorage.removeItem("naoseiOQUEfazerDAvida@_")
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
